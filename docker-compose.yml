@@ -1,0 +1,16 @@
+version: '3'
+services:
+  app:
+    container_name: vidsync-app
+    restart: always
+    build: .
+    ports:
+    - '8080:3000'
+    links:
+      - mongo
+
+  mongo:
+    container_name: vidsync-mongo
+    image: mongo
+    ports:
+    - '27018:27017'

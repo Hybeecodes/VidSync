@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Session</title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <div class="header">
+        <%- include('partials/guest_navbar');%>
+    </div>
+    <div class="row session-panel">
+        <div class="col-7 video">
+            <!--            <h2>Video Display</h2>-->
+            <iframe width="750" height="500"
+                    src="https://www.youtube.com/embed/tgbNymZ7vqY">
+            </iframe>
+        </div>
+        <div class="col-4 offset-md-1">
+            <div class="card users-panel">
+                <div class="card-header" id="connected-users-text">
+                    Connected Users
+                </div>
+                <ul class="list-group list-group-flush connected-users">
+                    <li class="list-group-item connected-user">Connected user 1</li>
+                    <li class="list-group-item connected-user">Connected user 2</li>
+                    <li class="list-group-item connected-user">Connected user 3</li>
+                    <li class="list-group-item connected-user">Connected user 4</li>
+                    <li class="list-group-item connected-user">Connected user 5</li>
+                    <li class="list-group-item connected-user">Connected user 6</li>
+                </ul>
+                <div class="card-footer">
+                    Admin User
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/javascripts/jquery-3.4.1.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
+    <script>
+        var socket = io();
+
+    </script>
+</body>
+</html>

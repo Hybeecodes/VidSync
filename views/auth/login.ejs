@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VidSync | Login</title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <div class="header">
+        <%- include('../partials/guest_navbar');%>
+    </div>
+
+    <div class="container card login">
+        <h3>Login</h3>
+        <form id="loginForm">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <a href="/register">Don't have an Account? Register here </a>
+        </form>
+    </div>
+
+    <script src="/javascripts/jquery-3.4.1.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/popper.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+#form {
+  width: 60%;
+  margin: 5% auto auto;
+}
+.session-panel {
+  width: 90%;
+  margin: 5% auto auto;
+}
+
+#connected-users-text {
+  font-size: 150%;
+  background: #007bff;
+  color: white;
+}
+
+.connected-user {
+  cursor: pointer;
+}
+
+.connected-user:hover {
+  background-color: #ebebeb;
+}
+
+.form-error {
+  color: red;
+}
+
+#url-error {
+  display: none;
+}
+
+.login {
+  width: 30%;
+  margin: 10% auto auto;
+  padding: 2%;
+}
+
+.register {
+  width: 30%;
+  margin: 5% auto auto;
+  padding: 2%;
+}

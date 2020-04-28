@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+  <div class="header">
+    <%- include('partials/guest_navbar');%>
+  </div>
+    <div class="container-fluid">
+      <div class="jumbotron">
+        <h1 class="display-4">Welcome!</h1>
+        <p class="lead">VidSync is a Web Application that allows you to watch YouTube videos in Sync with your Friends.</p>
+        <hr class="my-4">
+        <p>It uses utility classes for typography and spacing to space content out within the larger container.Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <a class="btn btn-primary btn-lg" href="/register" role="button">Get Started</a>
+      </div>
+    </div>
+    <script src="/javascripts/jquery-3.4.1.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/popper.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script>
+    $('#form').submit(function (e) {
+      e.preventDefault();
+      const url = $('#url').val();
+      if (!url) {
+        $('#url-error').text('*Required').show();
+        return;
+      }
+      const youtube_regex = /^(https?\:\/\/)?(server.js\.youtube\.com|youtu\.?be)\/.+$/;
+      if (!youtube_regex.test(url)) {
+        $('#url-error').text('*Invalid YouTube URL').show();
+        return;
+      }
+      // extract videoID from URL
+      // split url string and extract videoID
+      const urlArray = url.split('?v=');
+      const videoId = urlArray[1];
+      // call session creation endpoint
+      axios.post('/session/start', {
+        videoId
+      })
+      .then((res) => {
+        window.location.href = `/sessions/${res.data}`;
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    });
+
+  </script>
+  </body>
+</html>
