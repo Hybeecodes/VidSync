@@ -16,7 +16,7 @@
     <div class="row session-panel">
         <div class="col-7 video">
             <!--            <h2>Video Display</h2>-->
-            <div id="player"></div> <br>
+            <div id="player" style="pointer-events: none;" ></div> <br>
             <div class="row">
                 <div class="col-2">
                     <button id="playBtn">
@@ -33,13 +33,13 @@
                 </div>
                 <div class="col">
                     <div class="slidecontainer">
-                        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+                        <input type="range" min="0" max="100" value="0" class="slider" id="myRange">
                       </div>
                 </div>
             </div>
 
         </div>
-        <div class="col-4 offset-md-1">
+        <!-- <div class="col-4 offset-md-1">
             <div class="card users-panel">
                 <div class="card-header" id="connected-users-text">
                     Connected Users
@@ -56,7 +56,7 @@
                     Admin User
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
 
@@ -65,17 +65,6 @@
     <script src="/javascripts/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <script>
-        document.querySelector('#pauseBtn')
-            .addEventListener('click', function(e) {
-                console.log('ddd')
-                player.pauseVideo();
-            })
-
-        document.querySelector('#playBtn')
-            .addEventListener('click', function(e) {
-                console.log('ddd')
-                player.playVideo();
-            })
         // 2. This code loads the IFrame Player API code asynchronously.
         const tag = document.createElement('script');
 
@@ -107,34 +96,61 @@
             }
           });
         }
+        function sliderLoop() {
+            if(!player) {
+                return;
+            }
+            
+            setInterval(() => {
+                const currentTime = player.getCurrentTime();
+                const duration = player.getDuration();
+                const percentage = (currentTime/duration)*100;
+                document.getElementById('myRange')
+                .setAttribute('value', percentage);
+                console.log(currentTime, duration)
+            }, 200);
+        }
+        const socket = io('');
+        document.querySelector('#pauseBtn')
+            .addEventListener('click', function(e) {
+                console.log(player);
+                socket.emit('event', {state: 'PAUSE', time: player.getCurrentTime()});
+            });
+        document.getElementById('myRange')
+            .addEventListener('change', function (e) {
+                console.log('event', e);
+                const value = e.target.valueAsNumber;
+                const duration = player.getDuration();
+                const actualTime = duration * value / 100;
+                player.seekTo(actualTime);
+            })
+        document.querySelector('#playBtn')
+            .addEventListener('click', function(e) {
+                console.log('ddd')
+                socket.emit('event', {state: 'PLAY', time: player.getCurrentTime()});
+            });
+        socket.on('event', function(data) {
+            console.log(data);
+            if(data.state === 'PLAY') {
+                player.playVideo();
+            }else {
+                player.pauseVideo();
+            }
+        });
 
         // 4. The API will call this function when the video player is ready.
         function onPlayerReady(event) {
-            const divsToHide = document.getElementsByClassName("ytp-chrome-top-buttons"); //divsToHide is an array
-          console.log('hide');
-            for(var i = 0; i < divsToHide.length; i++){
-                divsToHide[i].style.visibility = "hidden"; // or
-                divsToHide[i].style.display = "none"; // depending on what you're doing
-            }
+            sliderLoop();
         }
 
         // 5. The API calls this function when the player's state changes.
         //    The function indicates that when playing a video (state=1),
         //    the player should play for six seconds and then stop.
         function onPlayerStateChange(event) {
-          if (event.data == YT.PlayerState.PLAYING) {
-
-          }
+           
         }
         function stopVideo() {
         }
-
-        document.querySelector('.progress')
-        .addEventListener('click', function(e) {
-            let width = this.offsetWidth;
-            console.log('clicked', e);
-            console.log('width', width);
-        })
     </script>
 </body>
 </html>
