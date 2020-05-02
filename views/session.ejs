@@ -65,6 +65,7 @@
     <script src="/javascripts/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <script>
+        const socket = io();
         // 2. This code loads the IFrame Player API code asynchronously.
         const tag = document.createElement('script');
 
@@ -107,18 +108,14 @@
                 const percentage = (currentTime/duration)*100;
                 document.getElementById('myRange')
                 .setAttribute('value', percentage);
-                console.log(currentTime, duration)
             }, 200);
         }
-        const socket = io('');
         document.querySelector('#pauseBtn')
             .addEventListener('click', function(e) {
-                console.log(player);
                 socket.emit('event', {state: 'PAUSE', time: player.getCurrentTime()});
             });
         document.getElementById('myRange')
             .addEventListener('change', function (e) {
-                console.log('event', e);
                 const value = e.target.valueAsNumber;
                 const duration = player.getDuration();
                 const actualTime = duration * value / 100;
@@ -126,11 +123,11 @@
             })
         document.querySelector('#playBtn')
             .addEventListener('click', function(e) {
-                console.log('ddd')
                 socket.emit('event', {state: 'PLAY', time: player.getCurrentTime()});
             });
         socket.on('event', function(data) {
             console.log(data);
+            player.seekTo(data.time);
             if(data.state === 'PLAY') {
                 player.playVideo();
             }else {
