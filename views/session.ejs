@@ -101,7 +101,7 @@
             if(!player) {
                 return;
             }
-            
+
             setInterval(() => {
                 const currentTime = player.getCurrentTime();
                 const duration = player.getDuration();
@@ -113,6 +113,7 @@
         document.querySelector('#pauseBtn')
             .addEventListener('click', function(e) {
                 socket.emit('event', {state: 'PAUSE', time: player.getCurrentTime()});
+                player.pauseVideo();
             });
         document.getElementById('myRange')
             .addEventListener('change', function (e) {
@@ -124,6 +125,7 @@
         document.querySelector('#playBtn')
             .addEventListener('click', function(e) {
                 socket.emit('event', {state: 'PLAY', time: player.getCurrentTime()});
+                player.playVideo();
             });
         socket.on('event', function(data) {
             console.log(data);
@@ -144,7 +146,7 @@
         //    The function indicates that when playing a video (state=1),
         //    the player should play for six seconds and then stop.
         function onPlayerStateChange(event) {
-           
+
         }
         function stopVideo() {
         }

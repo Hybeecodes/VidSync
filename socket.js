@@ -6,8 +6,8 @@ module.exports = server => {
         console.log('connected');
         socket.on('event', function(data) {
             console.log(data)
-            socket.emit('event', data);
+            socket.broadcast.emit('event', data);
         });
     });
-    
+
 }
