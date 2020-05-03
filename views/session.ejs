@@ -120,6 +120,7 @@
                 const value = e.target.valueAsNumber;
                 const duration = player.getDuration();
                 const actualTime = duration * value / 100;
+                socket.emit('event', {state: 'SEEK', time: actualTime});
                 player.seekTo(actualTime);
             })
         document.querySelector('#playBtn')
@@ -132,9 +133,9 @@
             player.seekTo(data.time);
             if(data.state === 'PLAY') {
                 player.playVideo();
-            }else {
+            }else if(data.state === 'PAUSE') {
                 player.pauseVideo();
-            }
+            }else if(data.state === 'SEEK') {}
         });
 
         // 4. The API will call this function when the video player is ready.
