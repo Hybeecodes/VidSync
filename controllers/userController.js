@@ -6,7 +6,12 @@ module.exports = {
             if(!username || !password) {
                 res.status(400).send({ message: 'Invalid Login Details'})
             }
-            User.loginUser(req.body);
+            const user = User.findOne({ username });
+            if (!user || !user.validPassword(password)) {
+                return res.status(400).send({success: false, message: 'Invalid Username or Password'});
+            }
+            res.session.user = user;
+            return res.status(200).send({success: true, message: 'Login Successful'});
         } catch (error) {
             next(error);
         }
