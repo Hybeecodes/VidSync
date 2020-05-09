@@ -50,7 +50,10 @@
                     password
                 }).then(function (res) {
                     console.log(res);
-                    $('.alert').removeClass('alert-warning').addClass('alert-success').text(res.response.data.message);
+                    $('.alert').removeClass('alert-warning').addClass('alert-success').text(res.data.message);
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 2000)
                 }).catch(function (error) {
                     console.log('error', error.response.data);
                     $('.alert').removeClass('alert-success').addClass('alert-warning').text(error.response.data.message);

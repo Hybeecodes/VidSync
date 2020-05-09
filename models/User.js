@@ -1,84 +1,58 @@
-const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
-const crypto = require('crypto');
+'use strict';
 
-const UserSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      lowercase: true,
-      unique: true,
-      required: [true, "can't be blank"],
-      match: [/^[a-zA-Z0-9]+$/, 'is invalid'],
-      index: true
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+
+const UserSchema = new mongoose.Schema({
+      username: {
+        type: String,
+        unique: true,
+        trim: true,
+        required: true
+      },
+      email: {
+        type: String,
+        unique: true,
+        lowercase: true,
+        required: true
+      },
+      password: {
+        type: String,
+        required: true
+      },
+      activation_token: {
+        type: String,
+        default: null
+      },
+      reset_token: {
+        type: String,
+        default: null
+      }
     },
-    email: {
-      type: String,
-      lowercase: true,
-      unique: true,
-      required: [true, "can't be blank"],
-      match: [/\S+@\S+\.\S+/, 'is invalid'],
-      index: true
-    },
-    password: String,
-    salt: String,
-    sessions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Channel' }]
-  },
-  { timestamps: true }
+    {
+      timestamps: true
+    }
 );
 
-UserSchema.plugin(uniqueValidator, { message: 'is already taken.' })
-
-UserSchema.statics.loginUser = function({ username, password }) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const user = await this.findOne({ username })
-      if (!user || !user.validPassword(password)) {
-        return reject(boom.unauthorized('username or password is invalid'))
-      }
-      resolve(user)
-    } catch (err) {
-      reject(err)
-    }
-  })
-}
-
-UserSchema.statics.createUser = function(body) {
-  const _this = this;
-  return new Promise(async (resolve, reject) => {
-    try {
-      //console.log(_this.model)
-      const user = _this.model('User')({ ...body })
-      user.setPassword(body.password)
-
-      await user.save()
-      resolve(user)
-    } catch (err) {
-      reject(err)
-    }
-  })
-}
-
-UserSchema.methods.validPassword = function(password) {
-  const hash = crypto
-    .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
-    .toString('hex')
-  return this.password === hash
-}
-
-UserSchema.methods.setPassword = function(password) {
-  this.salt = crypto.randomBytes(16).toString('hex')
-  this.password = crypto
-    .pbkdf2Sync(password, this.salt, 10000, 512, 'sha512')
-    .toString('hex')
-}
-
-UserSchema.methods.toJSON = function() {
-  return {
-    id: this.id,
-    username: this.username,
-    email: this.email
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next();
   }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+UserSchema.methods.comparePass = function comparePass (password) {
+  return bcrypt.compareSync(password, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema)
+UserSchema.methods.toJson = function toJson() {
+    return {
+        id: this._id,
+        email: this.email,
+        username: this.username
+    }
+}
+
+module.exports = mongoose.model('User', UserSchema);

@@ -17,6 +17,7 @@ content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=
 <div class="container card register">
     <h3>Register</h3>
     <form id="registerForm">
+        <div class="alert"></div>
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" class="form-control" id="email">
@@ -41,5 +42,36 @@ content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=
     <script src="/javascripts/jquery-3.4.1.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
     <script src="/javascripts/popper.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        $('#registerForm').submit(function (e) {
+            e.preventDefault();
+            console.log('submitted');
+            // validate inputs
+            const email = $('#email').val();
+            const username = $('#username').val();
+            const password = $('#password').val();
+            const con_password = $('#con_password').val();
+            if (!username || !password || !con_password || !email) {
+                $('.alert').removeClass('alert-success').addClass('alert-warning').text('Please fill all Fields');
+            }else{
+                axios.post('/register', {
+                    email,
+                    username,
+                    password,
+                    con_password
+                }).then(function (res) {
+                    console.log(res);
+                    $('.alert').removeClass('alert-warning').addClass('alert-success').text(res.data.message);
+                    setTimeout(() => {
+                        window.location.href = "/login";
+                    }, 2000)
+                }).catch(function (error) {
+                    console.log('error', error.response.data);
+                    $('.alert').removeClass('alert-success').addClass('alert-warning').text(error.response.data.message);
+                })
+            }
+        })
+    </script>
     </body>
     </html>

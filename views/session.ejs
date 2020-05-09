@@ -13,59 +13,103 @@
     <div class="header">
         <%- include('partials/guest_navbar');%>
     </div>
-    <div class="row session-panel">
-        <div class="col-7 video">
-            <!--            <h2>Video Display</h2>-->
-            <div id="player" style="pointer-events: none;" ></div> <br>
-            <div class="row">
-                <div class="col-2">
-                    <button id="playBtn">
-                        <svg class="bi bi-play-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z" style="color: #007bff;"/>
-                          </svg>
-                    </button>
-                    <button id="pauseBtn">
-                        <svg class="bi bi-pause-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5.5 3.5A1.5 1.5 0 017 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zm5 0A1.5 1.5 0 0112 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z" style="color: #007bff;"/>
-                          </svg>
-                    </button>
+    <%
+        if(session) { %>
+        <div class="row session-panel">
+            <div class="col-7 video">
+                <input type="hidden" id="videoId" value="<%= session.videoId%>">
+                <input type="hidden" id="sessionId" value="<%= session.sessionId%>">
+                <input type="hidden" id="userName" value="<%= user.username%>">
+                <input type="hidden" id="userId" value="<%= user.id%>">
+                <input type="hidden" id="isAdmin" value="<%= isAdmin%>">
+                <!--            <h2>Video Display</h2>-->
+                <div id="player" style="pointer-events: none;" ></div> <br>
+                <div class="row" id="controls">
+                    <div class="col-2">
+                        <button id="playBtn">
+                            <svg class="bi bi-play-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z" style="color: #007bff;"/>
+                            </svg>
+                        </button>
+                        <button id="pauseBtn">
+                            <svg class="bi bi-pause-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5.5 3.5A1.5 1.5 0 017 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zm5 0A1.5 1.5 0 0112 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z" style="color: #007bff;"/>
+                            </svg>
+                        </button>
 
+                    </div>
+                    <div class="col">
+                        <div class="slidecontainer">
+                            <input type="range" min="0" max="100" value="0" class="slider" id="myRange">
+                        </div>
+                    </div>
                 </div>
-                <div class="col">
-                    <div class="slidecontainer">
-                        <input type="range" min="0" max="100" value="0" class="slider" id="myRange">
-                      </div>
+
+            </div>
+             <div class="col-4 offset-md-1">
+                <div class="card users-panel">
+                    <div class="card-header" id="connected-users-text">
+                        Connected Users
+                    </div>
+                    <ul class="list-group list-group-flush" id="connected-users">
+                        <%
+                           if(session.connectedUsers.length > 0) {
+                                   session.connectedUsers.forEach((user) => { %>
+                                   <li class="list-group-item connected-user"><%= user.username %></li>
+                                <%   });
+                           }else { %>
+                               <p class="text-center">No Connected Users</p>
+                           <% }
+                            %>
+                    </ul>
+                    <div class="card-footer">
+                        <%= session.adminId.username%>
+                    </div>
                 </div>
             </div>
-
         </div>
-        <!-- <div class="col-4 offset-md-1">
-            <div class="card users-panel">
-                <div class="card-header" id="connected-users-text">
-                    Connected Users
-                </div>
-                <ul class="list-group list-group-flush connected-users">
-                    <li class="list-group-item connected-user">Connected user 1</li>
-                    <li class="list-group-item connected-user">Connected user 2</li>
-                    <li class="list-group-item connected-user">Connected user 3</li>
-                    <li class="list-group-item connected-user">Connected user 4</li>
-                    <li class="list-group-item connected-user">Connected user 5</li>
-                    <li class="list-group-item connected-user">Connected user 6</li>
-                </ul>
-                <div class="card-footer">
-                    Admin User
-                </div>
-            </div>
-        </div> -->
-    </div>
+    <%    }else{ %>
+                <h3>
+                    Invalid SessionId Passed
+                </h3>
+  <%  }
+    %>
 
 
     <script src="/javascripts/jquery-3.4.1.js"></script>
     <script src="/javascripts/bootstrap.min.js"></script>
     <script src="/javascripts/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        const socket = io();
+        console.log($('#connected-users'));
+        const isAdmin = $('#isAdmin').val();
+        console.log(typeof isAdmin);
+        if (isAdmin === 'false') {
+            $('#controls').hide();
+        }
+        const userName = $('#userName').val();
+        const sessionId = $('#sessionId').val();
+        const userId = $('#userId').val();
+        const socket = io(`?username=${userName}`);
+        socket.on('connect', function() {
+            socket.emit('join:session', { sessionId, userId});
+            // get list of connected users
+            axios.get(`/sessions/${sessionId}/users`).then((res) => {
+                const users = res.data.message;
+                if(users.length > 0) {
+                    let htmlContent = '';
+                    users.forEach((user) => {
+                        htmlContent += `
+                <li class="list-group-item connected-user">${user}</li>
+                `
+                    })
+                    $('#connected-users').html(htmlContent);
+                }
+            }).catch(err => {
+                console.log(err);
+            })
+        })
         // 2. This code loads the IFrame Player API code asynchronously.
         const tag = document.createElement('script');
 
@@ -77,16 +121,17 @@
         //    after the API code downloads.
         let player;
         function onYouTubeIframeAPIReady() {
+            const videoId = $('#videoId').val();
           player = new YT.Player('player', {
             height: '500',
             width: '850',
-            videoId: '0VFXs8HkQ3Y',
+            videoId,
             events: {
               'onReady': onPlayerReady,
               'onStateChange': onPlayerStateChange
             },
             playerVars: {
-                autoplay: 1,
+                autoplay: 0,
                 controls: 0,
                 disablekb: 1,
                 modestbranding: 1,
@@ -112,7 +157,7 @@
         }
         document.querySelector('#pauseBtn')
             .addEventListener('click', function(e) {
-                socket.emit('event', {state: 'PAUSE', time: player.getCurrentTime()});
+                socket.emit(`event`, {state: 'PAUSE', time: player.getCurrentTime(), sessionId});
                 player.pauseVideo();
             });
         document.getElementById('myRange')
@@ -120,22 +165,44 @@
                 const value = e.target.valueAsNumber;
                 const duration = player.getDuration();
                 const actualTime = duration * value / 100;
-                socket.emit('event', {state: 'SEEK', time: actualTime});
+                socket.emit('event', {state: 'SEEK', time: actualTime, sessionId});
+                console.log(actualTime);
                 player.seekTo(actualTime);
             })
         document.querySelector('#playBtn')
             .addEventListener('click', function(e) {
-                socket.emit('event', {state: 'PLAY', time: player.getCurrentTime()});
+                socket.emit('event', {state: 'PLAY', time: player.getCurrentTime(), sessionId});
                 player.playVideo();
             });
         socket.on('event', function(data) {
             console.log(data);
-            player.seekTo(data.time);
-            if(data.state === 'PLAY') {
-                player.playVideo();
-            }else if(data.state === 'PAUSE') {
-                player.pauseVideo();
-            }else if(data.state === 'SEEK') {}
+            if (player) {
+                if(data.state === 'PLAY') {
+                    player.seekTo(data.time);
+                    player.playVideo();
+                }else if(data.state === 'PAUSE') {
+                    player.seekTo(data.time);
+                    player.pauseVideo();
+                }else if(data.state === 'SEEK') {
+                    player.seekTo(data.time);
+                }
+            }
+        });
+
+        socket.on('joined:session', function (data) {
+            console.log('data', data);
+            const {connectedUsers} = data;
+            let htmlContent = '';
+            connectedUsers.forEach((user) => {
+                htmlContent += `
+                <li class="list-group-item connected-user">${user}</li>
+                `
+            });
+            $('#connected-users').html(htmlContent);
+            if(player.getPlayerState() === YT.PlayerState.PLAYING)
+            setTimeout(() => {
+                socket.emit('event', {state: 'SEEK', time: player.getCurrentTime(), sessionId});
+            }, 3000);
         });
 
         // 4. The API will call this function when the video player is ready.
