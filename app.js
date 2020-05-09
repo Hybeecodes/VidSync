@@ -13,7 +13,7 @@ const usersRouter = require('./routes/users');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost/vidSync', {
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds263028.mlab.com:63028/vid-sync`, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
