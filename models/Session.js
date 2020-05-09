@@ -4,20 +4,27 @@ const { Schema } = mongoose;
 const SessionSchema = new Schema({
     adminId: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'User'
     },
     videoId: {
         type: String,
         required: true
     },
+    sessionId: {
+        type: String,
+        required: true
+    },
     connectedUsers: [
         {
-            type: Schema.Types.ObjectId
+            type: Schema.Types.ObjectId,
+            ref: 'User'
         }
     ],
     status: {
         type: String,
-        enum: ['active', 'inactive']
+        enum: ['ACTIVE', 'INACTIVE'],
+        default: 'ACTIVE'
     }
 }, {
     timestamps: true
