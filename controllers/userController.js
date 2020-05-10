@@ -36,7 +36,8 @@ const userLogin = async (req, res) => {
         return res.status(400).send({status: 0, message: 'Invalid Email or Password'});
     }
     req.session.user = user.toJson();
-    return res.status(200).send({status: 1, message: 'Login Successful!!'});
+    const toRedirect = req.session.prevUrl? req.session.prevUrl: '/';
+    return res.status(200).send({status: 1, message: 'Login Successful!!', toRedirect});
 }
 
 

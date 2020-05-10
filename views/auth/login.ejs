@@ -52,7 +52,7 @@
                     console.log(res);
                     $('.alert').removeClass('alert-warning').addClass('alert-success').text(res.data.message);
                     setTimeout(() => {
-                        window.location.href = "/";
+                        window.location.href =res.data.toRedirect;
                     }, 2000)
                 }).catch(function (error) {
                     console.log('error', error.response.data);
