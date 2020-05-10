@@ -97,14 +97,18 @@
             // get list of connected users
             axios.get(`/sessions/${sessionId}/users`).then((res) => {
                 const users = res.data.message;
+                console.log('connected users on joinin', users);
                 if(users.length > 0) {
                     let htmlContent = '';
                     users.forEach((user) => {
                         htmlContent += `
-                <li class="list-group-item connected-user">${user}</li>
-                `
+                <li class="list-group-item connected-user">${user}</li>`
                     })
                     $('#connected-users').html(htmlContent);
+                }
+                // added new user to connected users
+                if(isAdmin === 'false') {
+                    $('#connected-users').html(`<li class="list-group-item connected-user">${userName}</li>`);
                 }
             }).catch(err => {
                 console.log(err);
