@@ -6,6 +6,9 @@
   width: 90%;
   margin: 5% auto auto;
 }
+body {
+  word-wrap: break-word;
+}
 
 #connected-users-text {
   font-size: 150%;
@@ -69,3 +72,28 @@
   background: #007bff;
   cursor: pointer;
 }
+
+/*    Media Queries   */
+/* On screens that are 992px or less, set the background color to blue */
+@media screen and (max-width: 992px) {
+  .login {
+    width: 70%;
+    margin: 10% auto auto;
+    padding: 2%;
+  }
+  .register {
+    width: 70%;
+    margin: 5% auto auto;
+    padding: 2%;
+  }
+
+  #player {
+    width: 340px;
+    height: 300px;
+  }
+
+  .slidecontainer {
+    margin: 10px;
+  }
+}
+
