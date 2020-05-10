@@ -219,9 +219,11 @@
                 `
             });
             $('#connected-users').html(htmlContent);
+            console.log(player.getPlayerState());
+            console.log(YT.PlayerState.PLAYING);
             if(player.getPlayerState() === YT.PlayerState.PLAYING)
             setTimeout(() => {
-                socket.emit('event', {state: 'SEEK', time: player.getCurrentTime(), sessionId});
+                socket.emit('event', {state: 'SEEK', time: player.getCurrentTime()+ 3, sessionId});
             }, 3000);
         });
 
