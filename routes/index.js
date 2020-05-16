@@ -24,22 +24,26 @@ router.post('/login', userLogin);
 
 router.post('/register', createUser);
 
-router.get('/sessions/:sessionId', AuthGuard, async (req, res) => {
+router.get('/sessions/:sessionId', async (req, res) => {
   const { sessionId } = req.params;
-  const session = await Session.findOne({sessionId, status: 'ACTIVE'}).populate('adminId').populate('connectedUsers');
-  console.log(session);
-  console.log(typeof String(req.session.user.id));
-  console.log(typeof String(session.adminId._id));
-  const isAdmin = String(req.session.user.id) === String(session.adminId._id);
-  console.log(isAdmin)
-  res.render('session', { AppName: APP_NAME, title: 'Session', session, user: req.session.user, isAdmin })
+  const session = await Session.findOne({sessionId, status: 'ACTIVE'});
+  let { user } = req.session;
+  if(! user) {
+    user = {
+      id: faker.random.uuid(),
+      email: faker.internet.email(),
+      username: faker.internet.userName()
+    };
+  }
+  const isAdmin = String(user.id) === String(session.adminId._id);
+  res.render('session', { AppName: APP_NAME, title: 'Session', session, user, isAdmin })
 });
 
-router.get('/sessions/:sessionId/users', AuthGuard, async (req, res) => {
+router.get('/sessions/:sessionId/users', async (req, res) => {
   const { sessionId } = req.params;
-  const session = await Session.findOne({sessionId}).populate({path: 'connectedUsers', select: 'username'});
+  const session = await Session.findOne({sessionId});
   const userNames = session.connectedUsers.map((user) => {
-    return user.username;
+    return user;
   });
   res.status(200).send({message: userNames});
 });
@@ -50,6 +54,7 @@ router.post('/session/start', async (req, res) => {
   const sessionId = nanoid(10);
   const session = new Session({
     adminId: req.session.user.id,
+    adminName: req.session.user.username,
     sessionId,
     videoId
   });

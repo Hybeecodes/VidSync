@@ -63,7 +63,7 @@
                             %>
                     </ul>
                     <div class="card-footer">
-                        <%= session.adminId.username%>
+                        <%= session.adminName%>
                     </div>
                     <br>
                 </div>
@@ -106,7 +106,8 @@
         const userId = $('#userId').val();
         const socket = io(`?username=${userName}`);
         socket.on('connect', function() {
-            socket.emit('join:session', { sessionId, userId});
+            console.log('USERNAME', userName);
+            socket.emit('join:session', { sessionId, userName });
             // get list of connected users
             axios.get(`/sessions/${sessionId}/users`).then((res) => {
                 const users = res.data.message;

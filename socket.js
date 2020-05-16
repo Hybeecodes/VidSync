@@ -10,25 +10,25 @@ module.exports = server => {
         });
 
         socket.on('join:session', async function(data) {
-            const {sessionId, userId} = data;
+            const {sessionId, userName} = data;
+            if(! sessionId || !userName) {
+                return ;
+            }
             socket.join(sessionId);
             // add user too session
-            console.log(userId);
-            let session = await Session.findOne({sessionId}).populate({path: 'connectedUsers', select: 'username'});
-            console.log('session', session);
+            let session = await Session.findOne({sessionId});
             const users = session.connectedUsers.map((user) => {
-                return user._id;
+                return user;
             });
-            console.log('users', users);
             if (session) {
-                if (!users.includes(userId) &&  userId !== String(session.adminId)) {
-                    session.connectedUsers.push(userId);
+                if (!users.includes(userName) &&  userName !== String(session.adminName)) {
+                    session.connectedUsers.push(userName);
                     await session.save();
                 }
             }
-            session = await Session.findOne({sessionId}).populate({path: 'connectedUsers', select: 'username'});
+            session = await Session.findOne({sessionId});
             const userNames = session.connectedUsers.map((user) => {
-                return user.username;
+                return user;
             });
             console.log('connected usernames', userNames);
             console.log(`${userName} joins session ${sessionId}`);
