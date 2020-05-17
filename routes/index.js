@@ -6,6 +6,7 @@ const { nanoid } = require('nanoid');
 const Session = require('../models/Session');
 const faker = require('faker');
 const AuthGuard = require('../middleware/auth.guard');
+const GuestGuard = require('../middleware/guest.guard');
 
 /* GET home page. */
 router.get('/', AuthGuard, function(req, res) {
@@ -24,17 +25,10 @@ router.post('/login', userLogin);
 
 router.post('/register', createUser);
 
-router.get('/sessions/:sessionId', async (req, res) => {
+router.get('/sessions/:sessionId', GuestGuard ,async (req, res) => {
   const { sessionId } = req.params;
   const session = await Session.findOne({sessionId, status: 'ACTIVE'});
   let { user } = req.session;
-  if(! user) {
-    user = {
-      id: faker.random.uuid(),
-      email: faker.internet.email(),
-      username: faker.internet.userName()
-    };
-  }
   const isAdmin = String(user.id) === String(session.adminId._id);
   res.render('session', { AppName: APP_NAME, title: 'Session', session, user, isAdmin })
 });
