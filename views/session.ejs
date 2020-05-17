@@ -74,6 +74,7 @@
                          <button class="btn btn-outline-secondary copyLink" data-clipboard-target="#link-field" type="button" id="button-addon2">Copy Link</button>
                      </div>
                  </div>
+                 <button class="btn btn-primary" id="endSession">End Session</button>
                  <%}%>
             </div>
         </div>
@@ -91,6 +92,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
         // TODO:: Handle when a user leaves the session
         console.log($('#connected-users'));
@@ -209,6 +211,13 @@
             }
         });
 
+        socket.on('session:ended', function (data) {
+            player.stopVideo();
+            swal('Session Ended By Admin').then(() => {
+                window.location.href = '/';
+            });
+        });
+
         socket.on('joined:session', function (data) {
             console.log('data', data);
             const {connectedUsers} = data;
@@ -240,6 +249,14 @@
         }
         function stopVideo() {
         }
+
+        $('#endSession').click(function (e) {
+            player.stopVideo();
+            socket.emit('end:session', {sessionId});
+            swal('Session Ended').then(() => {
+                window.location.href = '/';
+            });
+        });
 
         new ClipboardJS('.copyLink');
     </script>

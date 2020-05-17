@@ -3,9 +3,8 @@ module.exports = server => {
     const io = require('socket.io')(server);
     io.on('connection', async function(socket) {
         const userName = socket.handshake.query.username;
-        console.log(`${userName} is connected`);
+        console.log(`New Connection by ${userName}`);
         socket.on('event', function(data) {
-            console.log(data);
             socket.in(data.sessionId).emit('event', data);
         });
 
@@ -13,13 +12,10 @@ module.exports = server => {
             const {sessionId, userId} = data;
             socket.join(sessionId);
             // add user too session
-            console.log(userId);
             let session = await Session.findOne({sessionId}).populate({path: 'connectedUsers', select: 'username'});
-            console.log('session', session);
             const users = session.connectedUsers.map((user) => {
                 return user._id;
             });
-            console.log('users', users);
             if (session) {
                 if (!users.includes(userId) &&  userId !== String(session.adminId)) {
                     session.connectedUsers.push(userId);
@@ -30,7 +26,6 @@ module.exports = server => {
             const userNames = session.connectedUsers.map((user) => {
                 return user.username;
             });
-            console.log('connected usernames', userNames);
             console.log(`${userName} joins session ${sessionId}`);
             socket.in(sessionId).emit('joined:session', {
                 message: `${userName} has joined the session`,
@@ -47,6 +42,11 @@ module.exports = server => {
                 user: userName
             });
         });
+
+        socket.on('end:session', function ({sessionId}) {
+            console.log('end Session: ', sessionId);
+            socket.in(sessionId).emit('session:ended')
+        })
 
         socket.on('message', data => {
             const {room, message} = data;
