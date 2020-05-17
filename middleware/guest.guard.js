@@ -3,12 +3,12 @@ const faker = require('faker');
 module.exports = (req, res, next) => {
     let { user } = req.session;
     if(! user) {
-        user = {
+        req.session.user = {
             id: faker.random.uuid(),
             email: faker.internet.email(),
-            username: faker.internet.userName()
+            username: faker.internet.userName(),
+            isLoggedIn: false
         };
-        req.session.user = user;
     }
     next();
 };
