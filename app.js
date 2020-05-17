@@ -13,11 +13,12 @@ const usersRouter = require('./routes/users');
 
 const app = express();
 
-mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`, {
+const DB_URL = process.env.MONGO_URL || `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+mongoose.connect(DB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
-  console.log('DB Connected');
+  console.log(`DB Connected to ${DB_URL}`);
 }).catch((err) => {
   console.log('DB Error', err);
 });
