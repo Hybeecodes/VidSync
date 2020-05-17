@@ -7,6 +7,10 @@ const SessionSchema = new Schema({
         required: true,
         ref: 'User'
     },
+    adminName: {
+        type: String,
+        required: true
+    },
     videoId: {
         type: String,
         required: true
@@ -17,8 +21,7 @@ const SessionSchema = new Schema({
     },
     connectedUsers: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'User'
+            type: String,
         }
     ],
     status: {
