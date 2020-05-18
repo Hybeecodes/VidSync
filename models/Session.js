@@ -33,36 +33,38 @@ const SessionSchema = new Schema({
     timestamps: true
 });
 
-SessionSchema.statics.addUser = function ({user, sessionId}) {
+SessionSchema.statics.addUser = function ({userName, sessionId}) {
     let _this = this;
     return new Promise(async (resolve, reject) => {
         try {
-            const session = await _this.findById(sessionId);
+            const session = await _this.findOne({sessionId});
             if (
-                !session.connectedUsers.some(u => u.toString() === user._id.toString())
+                !session.connectedUsers.some(u => u === userName)
             ) {
-                session.connectedUsers.push(user._id);
+                session.connectedUsers.push(userName);
                 await session.save();
             }
             await _this.populate(session, ['connectedUsers']);
             resolve(session.connectedUsers);
         }catch (e) {
             console.log('Unable to add User to session: ', e);
+            reject(e);
         }
     });
 }
 
-SessionSchema.statics.removeUser = function ({user, sessionId}) {
+SessionSchema.statics.removeUser = function ({userName, sessionId}) {
     let _this = this;
     return new Promise(async (resolve, reject) => {
         try {
-            const session = await _this.findOne({ _id: sessionId });
-            session.connectedUsers.pull(user);
+            const session = await _this.findOne({ sessionId });
+            session.connectedUsers.pull(userName);
             await session.save();
             await _this.populate(session, ['connectedUsers']);
             resolve(session.connectedUsers);
         }catch (e) {
             console.log('Unable to remove User to session: ', e);
+            reject(e);
         }
     });
 }
