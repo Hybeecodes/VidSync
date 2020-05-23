@@ -66,7 +66,16 @@
                         <%= session.adminName%>
                     </div>
                     <br>
+                    <% if(isAdmin === false){%>
+                        <div class="input-group">
+                            <input type="text" id="update-username-input" class="form-control" placeholder="New username" aria-label="New username" value="<%= user.username%>">
+                            <div class="input-group-append">
+                                <button id="update-username-btn" class="btn btn-outline-success" type="button">Update</button>
+                            </div>
+                        </div>
+                    <%}%>
                 </div>
+
                  <% if(isAdmin === true){%>
                  <div class="input-group mb-3" style="padding: 5px;">
                      <input type="text" class="form-control" id="link-field" readonly placeholder="link" aria-label="Recipient's username" aria-describedby="button-addon2">
@@ -243,6 +252,19 @@
         }
 
         new ClipboardJS('.copyLink');
+
+        $(document).ready(function () {
+            $("#update-username-btn").click(function () {
+                const newUsername = $("#update-username-input").val();
+                axios.post('/guest/update', { username: newUsername })
+                .then((res) => {
+                    if(res.data.success == true) {
+                        socket.emit('change-name:session', {sessionId, prevUsername: userName , newUsername });
+                        location.reload();
+                    }
+                 });
+            });
+        });
     </script>
 </body>
 </html>

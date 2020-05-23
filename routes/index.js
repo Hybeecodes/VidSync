@@ -69,5 +69,11 @@ router.post('/session/:sessionId/newUser', async (req, res) => {
   await session.save();
 });
 
+router.post('/guest/update', async (req, res) => {
+  const { username } = req.body;
+  req.session.user = { ...req.session.user,  username };
+  res.status(200).send({success: true, message: "Username updated successfully"});
+});
+
 
 module.exports = router;
