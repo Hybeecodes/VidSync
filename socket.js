@@ -1,7 +1,8 @@
 const Session = require('./models/Session');
 module.exports = server => {
     const io = require('socket.io')(server);
-    io.on('connection', async function(socket) {
+
+    io.sockets.on('connection', async function(socket) {
         const userName = socket.handshake.query.username;
         console.log(`New Connection by ${userName}`);
         socket.on('event', function(data) {
@@ -13,27 +14,17 @@ module.exports = server => {
             if(! sessionId || !userName) {
                 return ;
             }
-            socket.join(sessionId);
-            // add user too session
-            let session = await Session.findOne({sessionId});
-            const users = session.connectedUsers.map((user) => {
-                return user;
-            });
-            if (session) {
-                if (!users.includes(userName) &&  userName !== String(session.adminName)) {
-                    session.connectedUsers.push(userName);
-                    await session.save();
-                }
-            }
-            session = await Session.findOne({sessionId});
-            const userNames = session.connectedUsers.map((user) => {
-                return user;
-            });
-            console.log(`${userName} joins session ${sessionId}`);
-            socket.in(sessionId).emit('joined:session', {
-                message: `${userName} has joined the session`,
-                user: userName,
-                connectedUsers: userNames
+            Session.addUser({userName, sessionId}).then((users) => {
+                socket.join(sessionId);
+                console.log('connected users', users);
+                console.log(`${userName} joins session ${sessionId}`);
+                socket.in(sessionId).emit('joined:session', {
+                    message: `${userName} has joined the session`,
+                    user: userName,
+                    connectedUsers: users
+                })
+            }).catch((err) => {
+                console.log('error');
             })
         });
 

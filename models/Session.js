@@ -38,17 +38,14 @@ SessionSchema.statics.addUser = function ({userName, sessionId}) {
     return new Promise(async (resolve, reject) => {
         try {
             const session = await _this.findOne({sessionId});
-            if (
-                !session.connectedUsers.some(u => u === userName)
-            ) {
+            if (!session.connectedUsers.some(u => u === userName)) {
                 session.connectedUsers.push(userName);
                 await session.save();
-            }
-            await _this.populate(session, ['connectedUsers']);
             resolve(session.connectedUsers);
+            }
         }catch (e) {
             console.log('Unable to add User to session: ', e);
-            reject(e);
+                reject(e);
         }
     });
 }
@@ -60,7 +57,6 @@ SessionSchema.statics.removeUser = function ({userName, sessionId}) {
             const session = await _this.findOne({ sessionId });
             session.connectedUsers.pull(userName);
             await session.save();
-            await _this.populate(session, ['connectedUsers']);
             resolve(session.connectedUsers);
         }catch (e) {
             console.log('Unable to remove User to session: ', e);
