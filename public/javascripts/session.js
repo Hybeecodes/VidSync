@@ -1,5 +1,6 @@
 console.log($('#connected-users'));
 const isAdmin = $('#isAdmin').val();
+let isSessionEnded = false;
 console.log(typeof isAdmin);
 if (isAdmin === 'false') {
     $('#controls').hide();
@@ -159,23 +160,23 @@ function onPlayerReady(event) {
 //    the player should play for six seconds and then stop.
 function onPlayerStateChange(event) {
     console.log('changed', event);
-    if (event.data === 5 && isAdmin === 'true') {
-        // suggest to End Session
-        swal({
-            title: "Do you want to End this Session?",
-            text: "It seems the video has ended so you might want to end this session",
-            icon: "info",
-            buttons: true,
-            dangerMode: true,
-        })
-            .then((willDelete) => {
-                if (willDelete) {
-                    $('#endSession').trigger();
-                } else {
-
-                }
-            });
-    }
+    // if (event.data === 5 && isAdmin === 'true' && !isSessionEnded) {
+    //     // suggest to End Session
+    //     swal({
+    //         title: "Do you want to End this Session?",
+    //         text: "It seems the video has ended so you might want to end this session",
+    //         icon: "info",
+    //         buttons: true,
+    //         dangerMode: true,
+    //     })
+    //         .then((willDelete) => {
+    //             if (willDelete) {
+    //                 $('#endSession').trigger();
+    //             } else {
+    //
+    //             }
+    //         });
+    // }
 }
 function stopVideo() {
 }
@@ -184,6 +185,7 @@ $('#endSession').click(function (e) {
     player.stopVideo();
     socket.emit('end:session', {sessionId});
     swal('Session Ended').then(() => {
+        isSessionEnded = true;
         window.location.href = '/';
     });
 });
