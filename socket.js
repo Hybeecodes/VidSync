@@ -4,7 +4,9 @@ module.exports = server => {
 
     io.sockets.on('connection', async function(socket) {
         const userName = socket.handshake.query.username;
+        const connectedSessionId = socket.handshake.query.sessionId;
         console.log(`New Connection by ${userName}`);
+
         socket.on('event', function(data) {
             socket.in(data.sessionId).emit('event', data);
         });
@@ -28,14 +30,17 @@ module.exports = server => {
             })
         });
 
-        socket.on('leave:session', function({ sessionId }) {
-            console.log(`${userName} leaves session ${sessionId}`);
-            socket.leave(sessionId);
-            socket.in(sessionId).emit('left:channel', {
-                message: `${userName} left the channel`,
-                user: userName
-            });
-        });
+        socket.on('disconnect', function() {
+            Session.removeUser({userName, sessionId:connectedSessionId}).then((users) => {
+                console.log(`${userName} leaves session ${connectedSessionId}`);
+                socket.leave(connectedSessionId);
+                socket.in(connectedSessionId).emit('left:channel', {
+                    message: `${userName} left the channel`,
+                    user: userName,
+                    connectedUsers: users
+                });
+            })
+        })
 
         socket.on('end:session', function ({sessionId}) {
             console.log('end Session: ', sessionId);

@@ -1,4 +1,3 @@
-// TODO:: Handle when a user leaves the session
 console.log($('#connected-users'));
 const isAdmin = $('#isAdmin').val();
 console.log(typeof isAdmin);
@@ -10,7 +9,7 @@ if (isAdmin === 'false') {
 const userName = $('#userName').val();
 const sessionId = $('#sessionId').val();
 const userId = $('#userId').val();
-const socket = io(`?username=${userName}`);
+const socket = io(`?username=${userName}&sessionId=${sessionId}`);
 socket.on('connect', function() {
     console.log('USERNAME', userName);
     socket.emit('join:session', { sessionId, userName });
@@ -34,9 +33,6 @@ socket.on('connect', function() {
         console.log(err);
     })
 })
-socket.on('disconnect', function() {
-    socket.emit('leave:session', {sessionId, userId});
-});
 // 2. This code loads the IFrame Player API code asynchronously.
 const tag = document.createElement('script');
 
@@ -140,6 +136,18 @@ socket.on('joined:session', function (data) {
             socket.emit('event', {state: 'SEEK', time: player.getCurrentTime()+ 3, sessionId});
         }, 3000);
 });
+
+socket.on('left:channel', function(data) {
+    console.log('data', data);
+    const {connectedUsers} = data;
+    let htmlContent = '';
+    connectedUsers.forEach((user) => {
+        htmlContent += `
+                <li class="list-group-item connected-user">${user}</li>
+                `
+    });
+    $('#connected-users').html(htmlContent);
+})
 
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {

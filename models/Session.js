@@ -39,7 +39,7 @@ SessionSchema.statics.addUser = function ({userName, sessionId}) {
         try {
             const session = await _this.findOne({sessionId});
             if (!session.connectedUsers.some(u => u === userName)) {
-                session.connectedUsers.push(userName);
+                if (userName !== session.adminName) session.connectedUsers.push(userName);
                 await session.save();
             resolve(session.connectedUsers);
             }
