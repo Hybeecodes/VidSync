@@ -54,6 +54,12 @@ module.exports = server => {
             if (session) {
                 session.connectedUsers = session.connectedUsers.map(username => username === prevUsername ? newUsername : username);
                 await session.save();
+
+                socket.in(sessionId).emit('joined:session', {
+                    message: `${userName} has joined the session`,
+                    user: newUsername,
+                    connectedUsers: session.connectedUsers
+                })
             }
         });
 

@@ -260,7 +260,7 @@
                 .then((res) => {
                     if(res.data.success == true) {
                         socket.emit('change-name:session', {sessionId, prevUsername: userName , newUsername });
-                        location.reload();
+                        $(`#connected-users li:contains("${userName}")`).text(newUsername);
                     }
                  });
             });
