@@ -48,6 +48,21 @@ module.exports = server => {
             });
         });
 
+        socket.on('change-name:session', async function({ sessionId, prevUsername, newUsername }) {
+            let session = await Session.findOne({ sessionId });
+
+            if (session) {
+                session.connectedUsers = session.connectedUsers.map(username => username === prevUsername ? newUsername : username);
+                await session.save();
+
+                socket.in(sessionId).emit('joined:session', {
+                    message: `${userName} has joined the session`,
+                    user: newUsername,
+                    connectedUsers: session.connectedUsers
+                })
+            }
+        });
+
         socket.on('message', data => {
             const {room, message} = data;
             socket.to(room).emit('message', data);

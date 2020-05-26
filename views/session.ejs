@@ -17,6 +17,7 @@
         if(session) { %>
         <div class="row session-panel">
             <div class="col-md-7 col-sm-6 video">
+                <div class="alert"></div>
                 <input type="hidden" id="videoId" value="<%= session.videoId%>">
                 <input type="hidden" id="sessionId" value="<%= session.sessionId%>">
                 <input type="hidden" id="userName" value="<%= user.username%>">
@@ -66,7 +67,16 @@
                         <%= session.adminName%>
                     </div>
                     <br>
+                    <% if(isAdmin === false){%>
+                        <div class="input-group">
+                            <input type="text" id="update-username-input" class="form-control" placeholder="New username" aria-label="New username" value="<%= user.username%>">
+                            <div class="input-group-append">
+                                <button id="update-username-btn" class="btn btn-outline-success" type="button">Update</button>
+                            </div>
+                        </div>
+                    <%}%>
                 </div>
+
                  <% if(isAdmin === true){%>
                  <div class="input-group mb-3" style="padding: 5px;">
                      <input type="text" class="form-control" id="link-field" readonly placeholder="link" aria-label="Recipient's username" aria-describedby="button-addon2">
@@ -243,6 +253,24 @@
         }
 
         new ClipboardJS('.copyLink');
+
+        $(document).ready(function () {
+            $("#update-username-btn").click(function () {
+                const newUsername = $("#update-username-input").val();
+                axios.post('/guest/update', { username: newUsername, sessionId })
+                .then((res) => {
+                    if(res.data.success == true) {
+                        socket.emit('change-name:session', {sessionId, prevUsername: userName , newUsername });
+                        $(`#connected-users li:contains("${userName}")`).text(newUsername);
+                        $('.alert').removeClass('alert-warning').addClass('alert-success').text(res.data.message);
+                    } else  {
+                        $('.alert').removeClass('alert-success').addClass('alert-warning').text(res.data.message);
+                    }
+                 }).catch(function (error) {
+                    $('.alert').removeClass('alert-success').addClass('alert-warning').text(error.response.data.message);
+                })
+            });
+        });
     </script>
 </body>
 </html>

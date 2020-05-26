@@ -69,5 +69,17 @@ router.post('/session/:sessionId/newUser', async (req, res) => {
   await session.save();
 });
 
+router.post('/guest/update', async (req, res) => {
+  const { username, sessionId } = req.body;
+
+  const session = await Session.findOne({sessionId, status: 'ACTIVE'});
+  if(session.connectedUsers.includes(username)) {
+    res.status(200).send({success: false, message: "Username already in use."});
+  } else  {
+    req.session.user = { ...req.session.user,  username };
+    res.status(200).send({success: true, message: "Username updated successfully"});
+  }
+});
+
 
 module.exports = router;
