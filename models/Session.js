@@ -33,6 +33,54 @@ const SessionSchema = new Schema({
     timestamps: true
 });
 
+SessionSchema.statics.addUser = function ({userName, sessionId}) {
+    let _this = this;
+    return new Promise(async (resolve, reject) => {
+        try {
+            const session = await _this.findOne({sessionId});
+            if (!session.connectedUsers.some(u => u === userName)) {
+                if (userName !== session.adminName) session.connectedUsers.push(userName);
+                await session.save();
+            resolve(session.connectedUsers);
+            }
+        }catch (e) {
+            console.log('Unable to add User to session: ', e);
+                reject(e);
+        }
+    });
+}
+
+SessionSchema.statics.removeUser = function ({userName, sessionId}) {
+    let _this = this;
+    return new Promise(async (resolve, reject) => {
+        try {
+            const session = await _this.findOne({ sessionId });
+            session.connectedUsers.pull(userName);
+            await session.save();
+            resolve(session.connectedUsers);
+        }catch (e) {
+            console.log('Unable to remove User to session: ', e);
+            reject(e);
+        }
+    });
+}
+
+SessionSchema.statics.changeUserName = function({prevUserName, newUserName, sessionId}) {
+    let _this = this;
+    return new Promise(async (resolve, reject) => {
+        try {
+            const session = await _this.findOne({ sessionId });
+            // check if username is not going to be a duplicate
+            session.connectedUsers = session.connectedUsers.map(username => username === prevUserName ? newUserName : username);
+            await session.save();
+            resolve(session.connectedUsers);
+        }catch (e) {
+            console.log('Unable to remove User to session: ', e);
+            reject(e);
+        }
+    });
+}
+
 const Session = mongoose.model('Session', SessionSchema);
 
 module.exports = Session;
