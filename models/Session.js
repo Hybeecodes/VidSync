@@ -65,6 +65,22 @@ SessionSchema.statics.removeUser = function ({userName, sessionId}) {
     });
 }
 
+SessionSchema.statics.changeUserName = function({prevUserName, newUserName, sessionId}) {
+    let _this = this;
+    return new Promise(async (resolve, reject) => {
+        try {
+            const session = await _this.findOne({ sessionId });
+            // check if username is not going to be a duplicate
+            session.connectedUsers = session.connectedUsers.map(username => username === prevUserName ? newUserName : username);
+            await session.save();
+            resolve(session.connectedUsers);
+        }catch (e) {
+            console.log('Unable to remove User to session: ', e);
+            reject(e);
+        }
+    });
+}
+
 const Session = mongoose.model('Session', SessionSchema);
 
 module.exports = Session;

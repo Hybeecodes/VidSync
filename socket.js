@@ -48,18 +48,14 @@ module.exports = server => {
         })
 
         socket.on('change-name:session', async function({ sessionId, prevUsername, newUsername }) {
-            let session = await Session.findOne({ sessionId });
-
-            if (session) {
-                session.connectedUsers = session.connectedUsers.map(username => username === prevUsername ? newUsername : username);
-                await session.save();
-
+            Session.changeUserName({prevUserName: prevUsername, newUserName: newUsername, sessionId}).then((users) => {
+                console.log(`${userName} changed his userName to ${newUsername}`)
                 socket.in(sessionId).emit('joined:session', {
                     message: `${userName} has joined the session`,
                     user: newUsername,
-                    connectedUsers: session.connectedUsers
+                    connectedUsers:users
                 })
-            }
+            })
         });
 
         socket.on('message', data => {

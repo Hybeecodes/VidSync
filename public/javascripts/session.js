@@ -190,4 +190,20 @@ $('#endSession').click(function (e) {
     });
 });
 
+$("#update-username-btn").click(function () {
+    const newUsername = $("#update-username-input").val();
+    axios.post('/guest/update', { username: newUsername, sessionId })
+        .then((res) => {
+            if(res.data.success === true) {
+                socket.emit('change-name:session', {sessionId, prevUsername: userName , newUsername });
+                $(`#connected-users li:contains("${userName}")`).text(newUsername);
+                $('.alert').removeClass('alert-warning').addClass('alert-success').text(res.data.message);
+            } else  {
+                $('.alert').removeClass('alert-success').addClass('alert-warning').text(res.data.message);
+            }
+    }).catch(function (error) {
+        $('.alert').removeClass('alert-success').addClass('alert-warning').text(error.response.data.message);
+    })
+});
+
 new ClipboardJS('.copyLink');
