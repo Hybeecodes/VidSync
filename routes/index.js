@@ -3,6 +3,7 @@ const router = express.Router();
 const { APP_NAME } = require('../config/config');
 const {createUser, userLogin} = require('../controllers/userController');
 const { nanoid } = require('nanoid');
+const randomString = require('randomstring');
 const Session = require('../models/Session');
 const faker = require('faker');
 const AuthGuard = require('../middleware/auth.guard');
@@ -44,14 +45,21 @@ router.get('/sessions/:sessionId/users', async (req, res) => {
 
 router.post('/session/start', async (req, res) => {
   // create session
-  const { videoId } = req.body;
+  const { videoId, type } = req.body;
   const sessionId = nanoid(10);
+  // if session is a Private one generate session password
+  const password = randomString.generate({
+    length: 8,
+    charset: 'alphanumeric'
+  });
   const session = new Session({
     adminId: req.session.user.id,
     adminName: req.session.user.username,
     sessionId,
-    videoId
+    videoId,
+    sessionType: type
   });
+  if (session.sessionType === 'PRIVATE') session.password = password;
   await session.save();
   // generate random name till we implement auth
   req.session.adminName = faker.internet.userName();

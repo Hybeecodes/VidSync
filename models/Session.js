@@ -19,6 +19,16 @@ const SessionSchema = new Schema({
         type: String,
         required: true
     },
+    sessionType: {
+        type: String,
+        enum: ['PUBLIC', 'PRIVATE'],
+        default: 'PUBLIC',
+        required: true
+    },
+    password: {
+        type: String,
+        default: null
+    },
     connectedUsers: [
         {
             type: String,
